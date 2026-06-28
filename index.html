@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador Informe Fotográfico Word</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8;min-height:100vh;padding:20px 14px;color:#1e2d3d}
+.wrap{max-width:900px;margin:0 auto}
+header{background:linear-gradient(135deg,#1a56a0,#0d3a6e);color:#fff;border-radius:12px;padding:22px 26px;margin-bottom:16px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 16px rgba(26,86,160,.3)}
+header .ico{font-size:36px}
+header h1{font-size:19px;font-weight:700;margin-bottom:3px}
+header p{font-size:12px;opacity:.85}
+.card{background:#fff;border-radius:12px;padding:22px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.card h2{font-size:14px;font-weight:600;color:#1a56a0;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.sn{background:#1a56a0;color:#fff;width:23px;height:23px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.fg{flex:1;min-width:170px}
+.fg label{display:block;font-size:11px;font-weight:600;color:#4a5568;margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px}
+.fg input,.fg select{width:100%;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;outline:none;background:#fafbfc;color:#1e2d3d;transition:border .2s}
+.fg input:focus,.fg select:focus{border-color:#1a56a0;background:#fff}
+.dz{border:2.5px dashed #a0b4cc;border-radius:10px;padding:34px 20px;text-align:center;cursor:pointer;background:#f8fafc;transition:all .2s}
+.dz:hover,.dz.over{border-color:#1a56a0;background:#eef4fc}
+.dz .di{font-size:42px;margin-bottom:8px}
+.dz h3{font-size:14px;font-weight:600;color:#2d3748;margin-bottom:4px}
+.dz p{font-size:12px;color:#718096}
+#fi{display:none}
+.bup{display:inline-block;margin-top:10px;padding:8px 18px;background:#1a56a0;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer}
+.bup:hover{background:#144080}
+#prevSec{display:none}
+.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.ph .cnt{font-size:13px;color:#4a5568;font-weight:500}
+.bcl{padding:5px 11px;border:1.5px solid #e53e3e;color:#e53e3e;background:#fff;border-radius:6px;font-size:12px;cursor:pointer}
+.bcl:hover{background:#e53e3e;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.pi{border:1.5px solid #e2e8f0;border-radius:8px;overflow:hidden;background:#edf2f7;position:relative}
+.pi img{width:100%;height:115px;object-fit:contain;display:block;background:#edf2f7}
+.pi textarea{width:100%;border:none;border-top:1px solid #e2e8f0;padding:5px 7px;font-size:11px;color:#2d3748;background:#fff;outline:none;resize:none}
+.pi .rb{position:absolute;top:3px;right:3px;width:19px;height:19px;background:rgba(229,62,62,.85);color:#fff;border:none;border-radius:50%;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.ob{position:absolute;top:3px;left:3px;background:rgba(26,86,160,.8);color:#fff;font-size:9px;padding:1px 5px;border-radius:3px;font-weight:600}
+.bgen{width:100%;padding:14px;background:linear-gradient(135deg,#1a56a0,#0d3a6e);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 4px 14px rgba(26,86,160,.35);transition:opacity .2s,transform .1s}
+.bgen:hover{opacity:.9;transform:translateY(-1px)}
+.bgen:disabled{opacity:.5;cursor:not-allowed;transform:none}
+#progSec{display:none;margin-top:12px}
+.pbw{background:#e2e8f0;border-radius:8px;height:10px;overflow:hidden;margin-bottom:7px}
+.pbf{height:100%;background:linear-gradient(90deg,#1a56a0,#3b82f6);border-radius:8px;transition:width .2s;width:0%}
+.pbl{font-size:12px;color:#4a5568;text-align:center}
+#okSec{display:none}
+.okb{text-align:center;padding:14px}
+.okb .oi{font-size:46px;margin-bottom:8px}
+.okb h3{font-size:16px;font-weight:700;color:#276749;margin-bottom:4px}
+.okb p{font-size:13px;color:#4a5568;margin-bottom:16px}
+.bdl{display:inline-block;padding:11px 26px;background:#276749;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none}
+.bdl:hover{background:#1d4f36}
+.brs{display:inline-block;margin-left:9px;padding:11px 20px;background:#fff;color:#1a56a0;border:2px solid #1a56a0;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+.brs:hover{background:#1a56a0;color:#fff}
+.err{background:#fff5f5;border:1.5px solid #fc8181;color:#c53030;padding:9px 13px;border-radius:8px;font-size:12px;margin-top:9px;display:none}
+.hint{font-size:11px;color:#a0aec0;margin-top:5px;font-style:italic}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="ico">📷</div>
+  <div>
+    <h1>Generador de Informe Fotográfico Word</h1>
+    <p>Fotos ajustadas sin recortar · 2 columnas · pie de foto · descarga inmediata</p>
+  </div>
+</header>
+
+<div class="card">
+  <h2><span class="sn">1</span> Configuración</h2>
+  <div class="row">
+    <div class="fg"><label>Título</label><input type="text" id="docTitle" value="REGISTRO FOTOGRÁFICO"></div>
+    <div class="fg"><label>Subtítulo / Proyecto</label><input type="text" id="docSub" placeholder="Ej: NE Huancayo 2024"></div>
+    <div class="fg">
+      <label>Ancho imagen</label>
+      <select id="imgCm">
+        <option value="7">Grande (7 cm)</option>
+        <option value="6" selected>Mediano (6 cm)</option>
+        <option value="5">Pequeño (5 cm)</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>Calidad / Velocidad</label>
+      <select id="qual">
+        <option value="0.9">Alta calidad</option>
+        <option value="0.72" selected>Equilibrada ⚡</option>
+        <option value="0.5">Muy rápida ⚡⚡</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2><span class="sn">2</span> Cargar fotografías</h2>
+  <div class="dz" id="dz">
+    <div class="di">🖼️</div>
+    <h3>Arrastra tus fotos aquí</h3>
+    <p>JPG · PNG · WEBP — múltiples archivos</p>
+    <button class="bup" onclick="document.getElementById('fi').click()">📁 Seleccionar fotos</button>
+  </div>
+  <input type="file" id="fi" multiple accept="image/jpeg,image/jpg,image/png,image/webp">
+  <p class="hint">💡 Puedes editar el pie de foto de cada imagen en la vista previa</p>
+  <div class="err" id="err"></div>
+</div>
+
+<div class="card" id="prevSec">
+  <h2><span class="sn">3</span> Vista previa y pies de foto</h2>
+  <div class="ph">
+    <span class="cnt" id="cnt"></span>
+    <button class="bcl" onclick="clearAll()">🗑 Limpiar todo</button>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="card">
+  <h2><span class="sn">4</span> Generar Word</h2>
+  <button class="bgen" id="btnGen" onclick="generateDocx()">📄 Generar y descargar .docx</button>
+  <div id="progSec">
+    <div class="pbw"><div class="pbf" id="pbf"></div></div>
+    <div class="pbl" id="pbl">Preparando...</div>
+  </div>
+</div>
+
+<div class="card" id="okSec">
+  <div class="okb">
+    <div class="oi">✅</div>
+    <h3>¡Documento listo!</h3>
+    <p>Tu informe fotográfico Word fue generado correctamente.</p>
+    <a id="dlLink" class="bdl">⬇️ Descargar .docx</a>
+    <button class="brs" onclick="restart()">🔄 Nuevo</button>
+  </div>
+</div>
+
+</div>
+<script>
+// ── Estado ──────────────────────────────────────────────────────────────────
+const photos = [];
+
+// ── Dropzone ─────────────────────────────────────────────────────────────────
+const dzEl = document.getElementById('dz');
+const fiEl = document.getElementById('fi');
+dzEl.addEventListener('dragover', e=>{e.preventDefault();dzEl.classList.add('over')});
+dzEl.addEventListener('dragleave', ()=>dzEl.classList.remove('over'));
+dzEl.addEventListener('drop', e=>{e.preventDefault();dzEl.classList.remove('over');handleFiles(e.dataTransfer.files)});
+dzEl.addEventListener('click', e=>{if(e.target.tagName!=='BUTTON') fiEl.click()});
+fiEl.addEventListener('change', e=>handleFiles(e.target.files));
+
+function handleFiles(files){
+  const valid=[...files].filter(f=>f.type.startsWith('image/'));
+  if(!valid.length){showErr('No se encontraron imágenes válidas.');return;}
+  hideErr();
+  let done=0;
+  const base=photos.length;
+  valid.forEach((file,i)=>{
+    const r=new FileReader();
+    r.onload=ev=>{
+      const img=new Image();
+      img.onload=()=>{
+        photos.push({
+          src:ev.target.result,
+          w:img.naturalWidth, h:img.naturalHeight,
+          caption:`Foto ${base+i+1} – ${file.name.replace(/\.[^.]+$/,'')}`
+        });
+        if(++done===valid.length) renderGrid();
+      };
+      img.src=ev.target.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+function renderGrid(){
+  const g=document.getElementById('grid');
+  g.innerHTML='';
+  photos.forEach((p,i)=>{
+    const d=document.createElement('div');
+    d.className='pi';
+    const orient=p.w>=p.h?'H':'V';
+    d.innerHTML=`<img src="${p.src}" alt=""><span class="ob">${orient==='H'?'↔ H':'↕ V'}</span>
+      <button class="rb" onclick="rmPhoto(${i})">✕</button>
+      <textarea rows="2" placeholder="Pie de foto..." onchange="photos[${i}].caption=this.value">${p.caption}</textarea>`;
+    g.appendChild(d);
+  });
+  document.getElementById('cnt').textContent=`${photos.length} foto${photos.length!==1?'s':''} cargada${photos.length!==1?'s':''}`;
+  document.getElementById('prevSec').style.display='block';
+}
+
+function rmPhoto(i){photos.splice(i,1);photos.length?renderGrid():document.getElementById('prevSec').style.display='none';}
+function clearAll(){photos.length=0;fiEl.value='';document.getElementById('prevSec').style.display='none';}
+function restart(){clearAll();document.getElementById('okSec').style.display='none';document.getElementById('progSec').style.display='none';document.getElementById('btnGen').disabled=false;prog(0,'');}
+function showErr(m){const e=document.getElementById('err');e.textContent='⚠️ '+m;e.style.display='block';}
+function hideErr(){document.getElementById('err').style.display='none';}
+function prog(p,l){document.getElementById('pbf').style.width=p+'%';document.getElementById('pbl').textContent=l;}
+
+// ── Comprimir imagen con Canvas → JPEG → ArrayBuffer ─────────────────────────
+function compress(src, maxPx, quality){
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.onload=()=>{
+      let w=img.naturalWidth, h=img.naturalHeight;
+      if(w>maxPx||h>maxPx){const s=maxPx/Math.max(w,h);w=Math.round(w*s);h=Math.round(h*s);}
+      const c=document.createElement('canvas');
+      c.width=w; c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      c.toBlob(blob=>{
+        const fr=new FileReader();
+        fr.onload=e=>resolve({buf:e.target.result, w, h});
+        fr.readAsArrayBuffer(blob);
+      },'image/jpeg',quality);
+    };
+    img.src=src;
+  });
+}
+
+// ── Helpers XML ──────────────────────────────────────────────────────────────
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ── Generar DOCX (JSZip + XML puro) ─────────────────────────────────────────
+async function generateDocx(){
+  if(!photos.length){showErr('Carga al menos una fotografía.');return;}
+  const btn=document.getElementById('btnGen');
+  btn.disabled=true;
+  document.getElementById('progSec').style.display='block';
+  document.getElementById('okSec').style.display='none';
+
+  try{
+    const cellCm=parseFloat(document.getElementById('imgCm').value)||6;
+    const quality=parseFloat(document.getElementById('qual').value)||0.72;
+    const EMU=360000; // 1 cm
+    const MAX_PX=1400;
+    const MAX_H_CM=9; // altura máxima imagen
+
+    prog(5,'Comprimiendo imágenes...');
+    const imgs=await Promise.all(photos.map(p=>compress(p.src,MAX_PX,quality)));
+    prog(50,'Construyendo documento XML...');
+
+    // ── Relaciones e IDs ──────────────────────────────────────────────────────
+    const rIds=imgs.map((_,i)=>`rId${i+10}`);
+
+    // ── Calcular tamaño EMU sin recorte ──────────────────────────────────────
+    function fitEmu(origW,origH){
+      const maxW=cellCm*EMU;
+      const maxH=MAX_H_CM*EMU;
+      const scale=Math.min(maxW/origW, maxH/origH);
+      return {cx:Math.round(origW*scale), cy:Math.round(origH*scale)};
+    }
+
+    // ── document.xml ─────────────────────────────────────────────────────────
+    const A4_W=11906, A4_H=16838, MAR=567; // 1 cm margen
+    const CONT_W=A4_W-MAR*2;
+    const CELL_W=Math.floor(CONT_W/2);
+
+    const bNone=`<w:top w:val="none" w:sz="0" w:space="0" w:color="auto"/><w:left w:val="none" w:sz="0" w:space="0" w:color="auto"/><w:bottom w:val="none" w:sz="0" w:space="0" w:color="auto"/><w:right w:val="none" w:sz="0" w:space="0" w:color="auto"/>`;
+
+    let rowsXml='';
+    for(let i=0;i<photos.length;i+=2){
+      // Fila imágenes
+      let imgRow='<w:tr>';
+      // Fila pies
+      let capRow='<w:tr>';
+      for(let col=0;col<2;col++){
+        const idx=i+col;
+        if(idx>=photos.length){
+          imgRow+=`<w:tc><w:tcPr><w:tcW w:w="${CELL_W}" w:type="dxa"/><w:tcBorders>${bNone}</w:tcBorders></w:tcPr><w:p/></w:tc>`;
+          capRow+=`<w:tc><w:tcPr><w:tcW w:w="${CELL_W}" w:type="dxa"/><w:tcBorders>${bNone}</w:tcBorders></w:tcPr><w:p/></w:tc>`;
+          continue;
+        }
+        const img=imgs[idx];
+        const ph=photos[idx];
+        const {cx,cy}=fitEmu(img.w,img.h);
+        const rId=rIds[idx];
+        const picId=idx+1;
+
+        imgRow+=`<w:tc>
+          <w:tcPr><w:tcW w:w="${CELL_W}" w:type="dxa"/><w:tcBorders>${bNone}</w:tcBorders>
+          <w:tcMar><w:top w:w="80" w:type="dxa"/><w:left w:w="80" w:type="dxa"/><w:bottom w:w="40" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar>
+          </w:tcPr>
+          <w:p><w:pPr><w:jc w:val="center"/></w:pPr>
+          <w:r><w:rPr/><w:drawing>
+            <wp:inline xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing">
+              <wp:extent cx="${cx}" cy="${cy}"/>
+              <wp:effectExtent l="0" t="0" r="0" b="0"/>
+              <wp:docPr id="${picId}" name="Foto${picId}"/>
+              <wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr>
+              <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+                <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
+                  <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
+                    <pic:nvPicPr>
+                      <pic:cNvPr id="${picId}" name="Foto${picId}"/>
+                      <pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr>
+                    </pic:nvPicPr>
+                    <pic:blipFill>
+                      <a:blip r:embed="${rId}" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/>
+                      <a:stretch><a:fillRect/></a:stretch>
+                    </pic:blipFill>
+                    <pic:spPr bwMode="auto">
+                      <a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm>
+                      <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+                      <a:noFill/>
+                    </pic:spPr>
+                  </pic:pic>
+                </a:graphicData>
+              </a:graphic>
+            </wp:inline>
+          </w:drawing></w:r></w:p>
+        </w:tc>`;
+
+        capRow+=`<w:tc>
+          <w:tcPr><w:tcW w:w="${CELL_W}" w:type="dxa"/><w:tcBorders>${bNone}</w:tcBorders>
+          <w:tcMar><w:top w:w="40" w:type="dxa"/><w:left w:w="80" w:type="dxa"/><w:bottom w:w="140" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tcMar>
+          </w:tcPr>
+          <w:p><w:pPr><w:jc w:val="center"/></w:pPr>
+          <w:r><w:rPr><w:i/><w:sz w:val="18"/><w:szCs w:val="18"/><w:color w:val="2d3748"/></w:rPr>
+          <w:t>${esc(ph.caption)}</w:t></w:r></w:p>
+        </w:tc>`;
+      }
+      imgRow+='</w:tr>';
+      capRow+='</w:tr>';
+      rowsXml+=imgRow+capRow;
+    }
+
+    const title=esc(document.getElementById('docTitle').value.trim()||'REGISTRO FOTOGRÁFICO');
+    const sub=esc(document.getElementById('docSub').value.trim());
+    let headerXml=`<w:p><w:pPr><w:jc w:val="center"/><w:spacing w:after="160"/></w:pPr>
+      <w:r><w:rPr><w:b/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:t>${title}</w:t></w:r></w:p>`;
+    if(sub) headerXml+=`<w:p><w:pPr><w:jc w:val="center"/><w:spacing w:after="400"/></w:pPr>
+      <w:r><w:rPr><w:sz w:val="22"/><w:szCs w:val="22"/><w:color w:val="4a5568"/></w:rPr><w:t>${sub}</w:t></w:r></w:p>`;
+
+    const docXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"
+  xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing"
+  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+  xmlns:w10="urn:schemas-microsoft-com:office:word"
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml"
+  xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup"
+  xmlns:wpi="http://schemas.microsoft.com/office/word/2010/wordprocessingInk"
+  xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml"
+  xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape"
+  mc:Ignorable="w14 wp14">
+<w:body>
+<w:sectPr>
+  <w:pgSz w:w="${A4_W}" w:h="${A4_H}"/>
+  <w:pgMar w:top="${MAR}" w:right="${MAR}" w:bottom="${MAR}" w:left="${MAR}" w:header="0" w:footer="0" w:gutter="0"/>
+</w:sectPr>
+${headerXml}
+<w:tbl>
+  <w:tblPr>
+    <w:tblW w:w="${CONT_W}" w:type="dxa"/>
+    <w:tblLayout w:type="fixed"/>
+    <w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="0" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="0" w:type="dxa"/></w:tblCellMar>
+  </w:tblPr>
+  <w:tblGrid>
+    <w:gridCol w:w="${CELL_W}"/>
+    <w:gridCol w:w="${CELL_W}"/>
+  </w:tblGrid>
+  ${rowsXml}
+</w:tbl>
+</w:body>
+</w:document>`;
+
+    // ── Relaciones document.xml.rels ──────────────────────────────────────────
+    let relsXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+  ${rIds.map((rid,i)=>`<Relationship Id="${rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/img${i}.jpg"/>`).join('\n  ')}
+</Relationships>`;
+
+    // ── Content Types ─────────────────────────────────────────────────────────
+    const ctXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Default Extension="jpg" ContentType="image/jpeg"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+</Types>`;
+
+    // ── _rels/.rels ───────────────────────────────────────────────────────────
+    const rootRels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`;
+
+    // ── styles.xml mínimo ─────────────────────────────────────────────────────
+    const stylesXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:docDefaults>
+    <w:rPrDefault><w:rPr>
+      <w:rFonts w:ascii="Arial" w:hAnsi="Arial"/>
+      <w:sz w:val="22"/><w:szCs w:val="22"/>
+    </w:rPr></w:rPrDefault>
+  </w:docDefaults>
+  <w:style w:type="paragraph" w:default="1" w:styleId="Normal">
+    <w:name w:val="Normal"/>
+  </w:style>
+</w:styles>`;
+
+    prog(70,'Empaquetando ZIP...');
+
+    // ── Construir ZIP ─────────────────────────────────────────────────────────
+    const zip=new JSZip();
+    zip.file('[Content_Types].xml', ctXml);
+    zip.file('_rels/.rels', rootRels);
+    zip.file('word/document.xml', docXml);
+    zip.file('word/styles.xml', stylesXml);
+    zip.file('word/_rels/document.xml.rels', relsXml);
+    imgs.forEach((img,i)=> zip.file(`word/media/img${i}.jpg`, img.buf));
+
+    prog(88,'Generando archivo...');
+
+    const blob=await zip.generateAsync({type:'blob', compression:'DEFLATE', compressionOptions:{level:4}});
+    const url=URL.createObjectURL(blob);
+
+    const fname=(document.getElementById('docTitle').value.trim()||'informe_fotografico').replace(/\s+/g,'_').toLowerCase();
+    const link=document.getElementById('dlLink');
+    link.href=url;
+    link.download=`${fname}_${new Date().toISOString().slice(0,10)}.docx`;
+
+    prog(100,'¡Listo!');
+    document.getElementById('okSec').style.display='block';
+    btn.disabled=false;
+
+    // Auto-click descarga
+    link.click();
+
+  }catch(err){
+    console.error(err);
+    showErr('Error: '+err.message);
+    document.getElementById('progSec').style.display='none';
+    document.getElementById('btnGen').disabled=false;
+  }
+}
+</script>
+</body>
+</html>
